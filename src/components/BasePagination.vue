@@ -1,6 +1,4 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
   <ul class="pagination">
@@ -17,47 +15,47 @@
 </template>
 
 <style scoped lang="scss">
-  @import "../assets/variables";
+@import '../assets/variables';
 
-  .pagination {
-    display: flex;
-    justify-content: center;
-    column-gap: 15px;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+.pagination {
+  display: flex;
+  justify-content: center;
+  column-gap: 15px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 
-    list-style: none;
-  }
+  list-style: none;
+}
 
-  .pagination__item {
-  }
+.pagination__item {
+}
 
-  .pagination__link {
-    display: block;
-    padding: 7px 15px;
+.pagination__link {
+  display: block;
+  padding: 7px 15px;
 
-    color: var(--black-color);
-    text-decoration: none;
+  color: var(--black-color);
+  text-decoration: none;
 
-    background-color: var(--blue-light-color);
-    border-radius: 10px;
-    border: 1px solid var(--gray-light-color);
+  background-color: var(--blue-light-color);
+  border-radius: 10px;
+  border: 1px solid var(--gray-light-color);
 
-    transition: $transition;
+  transition: $transition;
 
-    &:hover,
-    &:focus {
-      color: var(--white-color);
-
-      background-color: var(--blue-color);
-    }
-  }
-
-  .pagination__item--active .pagination__link {
+  &:hover,
+  &:focus {
     color: var(--white-color);
 
     background-color: var(--blue-color);
-    border-color: transparent;
   }
+}
+
+.pagination__item--active .pagination__link {
+  color: var(--white-color);
+
+  background-color: var(--blue-color);
+  border-color: transparent;
+}
 </style>

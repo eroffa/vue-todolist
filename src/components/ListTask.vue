@@ -1,40 +1,65 @@
 <script setup>
-  const arr = [
-    {id: 1, title: 'Сходить в магазин за хлебом'},
-    {id: 2, title: 'Переустановить винду на линукс и снести'},
-    {id: 3, title: 'Доделать сборку вебпак'},
-    {id: 4, title: 'Допилить сайт продажи квартир'},
-    {id: 5, title: 'Позвонить по поводу ремонта в доме'},
-    {id: 6, title: 'Узнать цену на модель часов'},
-  ]
+  const props = defineProps({
+    tasks: {
+      type: Array,
+      required: true,
+    },
+  })
+
+  const emit = defineEmits(['removeTask'])
+
+  const onDeleteTask = (id) => {
+    emit('removeTask', id)
+  }
+
+  const onChecked = (event, task) => {
+    task.checked = event.target.checked
+  }
 </script>
 
 <template>
-  <ul class="list-task">
+  <ul v-if="props.tasks.length > 0" class="list-task">
     <li class="list-task__item">
       <form class="list-task__form" action="" method="post">
-        <p v-for="item in arr" :key="item.id" class="list-task__input-wrap">
-          <input :id="item.id" class="sr-only list-task__checkbox" type="checkbox" name="task-1"
-                 :value="item.title">
-          <label class="list-task__desc" :for="item.id">{{ item.title }}</label>
+        <p v-for="task in props.tasks" :key="task.id" class="list-task__input-wrap">
+          <input
+              :id="task.id"
+              class="sr-only list-task__checkbox"
+              type="checkbox"
+              :name="'task-' + task.id"
+              :value="task.desc"
+              :checked="task.checked"
+          />
+          <label class="list-task__desc" @change="onChecked($event, task)" :for="task.id">{{ task.desc }}</label>
           <font-awesome-icon class="list-task__icon" :icon="['fa', 'check']"/>
 
-          <button class="button button--remove list-task__button" type="submit">Удалить</button>
+          <button
+              class="button button--remove list-task__button"
+              type="submit"
+              @click.prevent="onDeleteTask(task.id)"
+          >
+            Удалить
+          </button>
         </p>
-
       </form>
     </li>
   </ul>
+  <p v-else class="list-task list-task--center">Текущих задач нет</p>
 </template>
 
 <style scoped lang="scss">
-  @import "../assets/variables";
+  @import '../assets/variables';
 
   .list-task {
     margin: 0;
     padding: 40px;
 
     list-style: none;
+
+    &--center {
+      padding-bottom: 70px;
+      text-align: center;
+    }
   }
 
   .list-task__item {
@@ -61,13 +86,13 @@
   }
 
   .list-task__checkbox {
-
   }
 
   .list-task__desc {
     position: relative;
 
     display: inline-block;
+    flex-grow: 1;
     padding: 0 30px 0 60px;
 
     cursor: pointer;
@@ -80,7 +105,7 @@
 
       width: 30px;
       height: 30px;
-      content: "";
+      content: '';
     }
 
     &::before {
@@ -113,6 +138,7 @@
     color: var(--blue-color);
 
     opacity: 0;
+    pointer-events: none;
 
     transition: $transition;
   }
