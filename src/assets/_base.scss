@@ -27,3 +27,51 @@ body {
   margin: 0 auto;
   padding: 0 $gap;
 }
+
+.button {
+  display: inline-block;
+  padding: 12px 33px;
+
+  color: var(--black-color);
+  font-family: inherit;
+
+
+  background-color: var(--gray-light-color);
+  border: 1px solid var(--gray-light-color);
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  transition: $transition;
+
+  &:hover,
+  &:focus {
+    background-color: var(--gray-color);
+    outline: none;
+  }
+}
+
+.button--primary {
+  color: var(--white-color);
+
+  background-color: var(--blue-color);
+
+  &:hover,
+  &:focus {
+    background-color: var(--blue-hover-color);
+  }
+}
+
+.button--remove {
+  color: var(--red-color);
+
+  background-color: transparent;
+  border-color: var(--red-color);
+
+  &:hover,
+  &:focus {
+    color: var(--white-color);
+
+    background-color: var(--red-color);
+  }
+}

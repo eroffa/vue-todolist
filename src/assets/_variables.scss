@@ -6,6 +6,8 @@
   --blue-color: #4159f7;
   --blue-light-color: #f0f2fe;
   --red-color: #f74141;
+
+  --blue-hover-color: #2d46e1;
 }
 
 $ff: Roboto, Arial, sans-serif;
@@ -16,3 +18,5 @@ $gap: 20px;
 
 $min-width: 320px;
 $desktop-width: 1000px;
+
+$transition: all 0.3s ease;
