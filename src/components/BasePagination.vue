@@ -1,15 +1,30 @@
-<script setup></script>
+<script setup>
+  const props = defineProps({
+    page: {
+      type: Number,
+      default: 1,
+    },
+    total: {
+      type: Number,
+      required: true
+    }
+  })
+
+  const pagination = () => {
+    const pages = []
+
+    for (let i = 1; i <= Math.ceil(props.total / 20); i++) {
+      pages.push(i)
+    }
+
+    return pages
+  }
+</script>
 
 <template>
-  <ul class="pagination">
-    <li class="pagination__item pagination__item--active">
-      <a class="pagination__link" href="#">1</a>
-    </li>
-    <li class="pagination__item">
-      <a class="pagination__link" href="#">2</a>
-    </li>
-    <li class="pagination__item">
-      <a class="pagination__link" href="#">3</a>
+  <ul v-if="pagination().length > 1" class="pagination">
+    <li v-for="page in pagination()" :key="page" :class="['pagination__item', {'pagination__item--active': page === props.page }]">
+      <RouterLink class="pagination__link" :to="{name: 'home', query: { page: page }}">{{ page }}</RouterLink>
     </li>
   </ul>
 </template>

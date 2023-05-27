@@ -10,8 +10,8 @@ const apiClient = axios.create({
 })
 
 export default {
-  loadTasks() {
-    return apiClient.get('/tasks')
+  loadTasks(perPage, page) {
+    return apiClient.get(`/tasks?_limit=${perPage}&_page=${page}`)
   },
 
   updateTask(task) {

@@ -8,6 +8,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+      props: route => ({ page: parseInt(route.query.page) || 1 })
     }
   ],
 })

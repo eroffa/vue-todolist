@@ -10,10 +10,12 @@ export const useTasksStore = defineStore('tasks', () => {
     checkedTasks.value = tasks.value
   })
 
-  const load = async () => {
+  const load = async (perPage, page) => {
     try {
-      const response = await TaskService.loadTasks()
+      const response = await TaskService.loadTasks(perPage, page)
       tasks.value = response.data
+
+      return response
     } catch (e) {
       console.error(e.message)
     }
