@@ -31,7 +31,8 @@ export const useTasksStore = defineStore('tasks', () => {
   const add = async (task) => {
     try {
       tasks.value.push(task)
-      await TaskService.addTask(task)
+      const response = await TaskService.addTask(task)
+      console.log(response)
     } catch (e) {
       console.error(e.message)
     }
