@@ -1,31 +1,141 @@
 <script setup>
+  import {onBeforeUpdate, onMounted, ref} from 'vue'
+  import {useTasksStore} from '@/store/tasks'
 
+  const useTasks = useTasksStore()
+
+  const filters = ref([
+    { key: 'all', title: 'Все', link: '?filter=all', active: true },
+    { key: 'pending', title: 'Активные', link: '?filter=pending', active: false },
+    { key: 'completed', title: 'Завершенные', link: '?filter=completed', active: false },
+    { key: 'search', title: 'Поиск по задачи', link: '?filter=search', active: false },
+  ])
+
+  const phrases = ref({
+    input: 'Добавить новую задачу',
+    button: 'Добавить',
+  })
+
+  const input = ref(null)
+  const inputValue = ref('')
+
+  const onChangeFilter = (filter) => {
+    filters.value.map(item => item.active = item === filter || item.key === 'all' && filter.key === 'search')
+
+    if (filter.key === 'all') {
+      useTasks.checkedTasks = useTasks.tasks
+    }
+
+    if (filter.key === 'pending') {
+      useTasks.checkedTasks = useTasks.tasks.filter(task => !task.checked)
+    }
+
+    if (filter.key === 'completed') {
+      useTasks.checkedTasks = useTasks.tasks.filter(task => task.checked)
+    }
+
+    if (filter.key === 'search') {
+      phrases.value.input = 'Поиск задачи'
+      phrases.value.button = 'Найти'
+
+      useTasks.checkedTasks = useTasks.tasks
+    } else {
+      phrases.value.input = 'Добавить новую задачу'
+      phrases.value.button = 'Добавить'
+    }
+  }
+
+  const onSubmit = () => {
+    const input = inputValue.value.trim()
+
+    if (input.length < 3) {
+      alert('Количество введенных символов меньше 3-х')
+      return
+    }
+
+    const filterSearch = filters.value.find(filter => filter.key === 'search' && filter.active)
+
+    if (filterSearch) {
+      useTasks.checkedTasks = useTasks.tasks.filter(task => task.desc.toLowerCase().includes(input.toLowerCase()))
+      return
+    }
+
+    const lastId = useTasks.tasks.length > 0 ? useTasks.tasks[useTasks.tasks.length - 1].id + 1 : 1
+    const newTask = {
+      id: lastId,
+      desc: input,
+      checked: false,
+    }
+
+    useTasks.add(newTask)
+
+    inputValue.value = ''
+  }
+
+  const onRemoveAll = () => {
+    const answer = confirm('Вы точно хотите удалить все задачи?')
+
+    if (!answer) {
+      return
+    }
+
+    useTasks.removeAll()
+  }
+
+  onMounted(() => {
+    input.value.focus()
+  })
+
+  onBeforeUpdate(() => {
+    input.value.focus()
+  })
 </script>
 
 <template>
   <div class="action-task">
-    <form class="action-task__form" action="" method="post">
+    <form class="action-task__form" action="" method="post" @submit.prevent="onSubmit">
       <div class="action-task__enter">
         <p class="action-task__input-wrap">
-          <input class="action-task__input" type="text" name="task" value="" placeholder="Добавить новую задачу">
-          <font-awesome-icon class="action-task__icon" :icon="['far', 'clock']" />
+          <input
+              class="action-task__input"
+              type="text"
+              name="task"
+              v-model="inputValue"
+              :placeholder="phrases.input"
+              ref="input"
+          />
+          <font-awesome-icon class="action-task__icon" :icon="['far', 'clock']"/>
         </p>
-        <button class="button button--primary action-task__add" type="submit" aria-label="Добавить">Добавить</button>
-        <button class="button button--remove action-task__remove" type="button" aria-label="Удалить все">Удалить все</button>
+        <button class="button button--primary action-task__add" type="submit" :aria-label="phrases.button">
+          {{ phrases.button }}
+        </button>
+        <button
+            class="button button--remove action-task__remove"
+            type="button"
+            aria-label="Удалить все"
+            @click="onRemoveAll"
+        >
+          Удалить все
+        </button>
       </div>
 
       <p class="action-task__filter">
-        <a class="action-task__toggle action-task__toggle--active" href="?filter=all">Все</a>
-        <a class="action-task__toggle" href="?filter=active">Активные</a>
-        <a class="action-task__toggle" href="?filter=completed">Завершенные</a>
-        <a class="action-task__toggle" href="?filter=search">Поиск по задачи</a>
+        <RouterLink
+            v-for="item in filters"
+            :key="item.key"
+            :class="['action-task__toggle', { 'action-task__toggle--active': item.active }]"
+            :to="item.link"
+            tabindex="0"
+            @click.prevent="onChangeFilter(item)"
+        >{{ item.title }}
+        </RouterLink>
       </p>
     </form>
   </div>
 </template>
 
 <style scoped lang="scss">
-  @import "../assets/variables";
+  @import '../assets/variables';
 
   .action-task {
     padding: 40px 40px 20px;
@@ -104,25 +214,33 @@
 
     transition: $transition;
 
+    cursor: pointer;
+
     &:hover,
     &:focus,
     &--active {
       color: var(--blue-color);
-
-      outline: none;
     }
-  }
 
-  .action-task__toggle--active {
     &::before {
       position: absolute;
       bottom: 0;
 
       width: 100%;
       height: 2px;
-      content: "";
+      content: '';
 
       background-color: var(--blue-color);
+
+      opacity: 0;
+
+      transition: $transition;
+    }
+  }
+
+  .action-task__toggle--active {
+    &::before {
+      opacity: 1;
     }
   }
 
@@ -162,7 +280,7 @@
 
         width: 10px;
         height: 2px;
-        content: "";
+        content: '';
 
         background-color: var(--white-color);
 

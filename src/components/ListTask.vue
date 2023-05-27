@@ -1,40 +1,73 @@
 <script setup>
-  const arr = [
-    {id: 1, title: 'Сходить в магазин за хлебом'},
-    {id: 2, title: 'Переустановить винду на линукс и снести'},
-    {id: 3, title: 'Доделать сборку вебпак'},
-    {id: 4, title: 'Допилить сайт продажи квартир'},
-    {id: 5, title: 'Позвонить по поводу ремонта в доме'},
-    {id: 6, title: 'Узнать цену на модель часов'},
-  ]
+  import {useTasksStore} from '@/store/tasks'
+
+  const useTasks = useTasksStore()
+
+  const props = defineProps({
+    tasks: {
+      type: Array,
+      required: true,
+    },
+  })
+
+  const emit = defineEmits(['checkTask'])
+
+  const onCheck = (task, event) => {
+    emit('checkTask', { task, event })
+  }
+
+  const onRemove = (task) => {
+    const answer = confirm('Вы точно хотите удалить эту задачу?')
+
+    if (!answer) {
+      return
+    }
+
+    useTasks.remove(task)
+  }
 </script>
 
 <template>
-  <ul class="list-task">
+  <ul v-if="props.tasks.length > 0" class="list-task">
     <li class="list-task__item">
       <form class="list-task__form" action="" method="post">
-        <p v-for="item in arr" :key="item.id" class="list-task__input-wrap">
-          <input :id="item.id" class="sr-only list-task__checkbox" type="checkbox" name="task-1"
-                 :value="item.title">
-          <label class="list-task__desc" :for="item.id">{{ item.title }}</label>
+        <p v-for="task in props.tasks" :key="task.id" class="list-task__input-wrap">
+          <input
+              :id="task.id"
+              class="sr-only list-task__checkbox"
+              type="checkbox"
+              name="task-1"
+              :value="task.desc"
+              :checked="task.checked"
+              @change="onCheck(task, $event)"
+          />
+          <label class="list-task__desc" :for="task.id">{{ task.desc }}</label>
           <font-awesome-icon class="list-task__icon" :icon="['fa', 'check']"/>
 
-          <button class="button button--remove list-task__button" type="submit">Удалить</button>
+          <button class="button button--remove list-task__button" type="submit" @click.prevent="onRemove(task)">Удалить
+          </button>
         </p>
-
       </form>
     </li>
   </ul>
+  <p v-else class="list-task list-task--center">Список задач пуст</p>
 </template>
 
 <style scoped lang="scss">
-  @import "../assets/variables";
+  @import '../assets/variables';
 
   .list-task {
     margin: 0;
     padding: 40px;
 
     list-style: none;
+
+    &--center {
+      padding-bottom: 70px;
+
+      color: var(--gray-color);
+      text-align: center;
+    }
   }
 
   .list-task__item {
@@ -61,12 +94,12 @@
   }
 
   .list-task__checkbox {
-
   }
 
   .list-task__desc {
     position: relative;
 
+    flex-grow: 1;
     display: inline-block;
     padding: 0 30px 0 60px;
 
@@ -80,7 +113,7 @@
 
       width: 30px;
       height: 30px;
-      content: "";
+      content: '';
     }
 
     &::before {
@@ -115,6 +148,8 @@
     opacity: 0;
 
     transition: $transition;
+
+    pointer-events: none;
   }
 
   .list-task__checkbox:checked ~ .list-task__icon {
