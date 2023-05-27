@@ -9,15 +9,19 @@ const apiClient = axios.create({
 })
 
 export default {
-  getTasks() {
+  loadTasks() {
     return apiClient.get('/tasks')
   },
 
-  deleteTask(id) {
-    return apiClient.delete(`/tasks/${id}`)
+  updateTask(task) {
+    return apiClient.put(`/tasks/${task.id}`, task)
   },
 
-  addTask(data) {
-    return apiClient.post(`/tasks`, data)
-  }
+  addTask(task) {
+    return apiClient.post(`/tasks`, task)
+  },
+
+  removeTask(task) {
+    return apiClient.delete(`/tasks/${task.id}`)
+  },
 }

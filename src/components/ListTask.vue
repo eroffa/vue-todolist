@@ -1,4 +1,8 @@
 <script setup>
+  import {useTasksStore} from '@/store/tasks'
+
+  const useTasks = useTasksStore()
+
   const props = defineProps({
     tasks: {
       type: Array,
@@ -6,14 +10,20 @@
     },
   })
 
-  const emit = defineEmits(['removeTask'])
+  const emit = defineEmits(['checkTask'])
 
-  const onDeleteTask = (id) => {
-    emit('removeTask', id)
+  const onCheck = (task, event) => {
+    emit('checkTask', { task, event })
   }
 
-  const onChecked = (event, task) => {
-    task.checked = event.target.checked
+  const onRemove = (task) => {
+    const answer = confirm('Вы точно хотите удалить эту задачу?')
+
+    if (!answer) {
+      return
+    }
+
+    useTasks.remove(task)
   }
 </script>
 
@@ -26,25 +36,21 @@
               :id="task.id"
               class="sr-only list-task__checkbox"
               type="checkbox"
-              :name="'task-' + task.id"
+              name="task-1"
               :value="task.desc"
               :checked="task.checked"
+              @change="onCheck(task, $event)"
           />
-          <label class="list-task__desc" @change="onChecked($event, task)" :for="task.id">{{ task.desc }}</label>
+          <label class="list-task__desc" :for="task.id">{{ task.desc }}</label>
           <font-awesome-icon class="list-task__icon" :icon="['fa', 'check']"/>
 
-          <button
-              class="button button--remove list-task__button"
-              type="submit"
-              @click.prevent="onDeleteTask(task.id)"
-          >
-            Удалить
+          <button class="button button--remove list-task__button" type="submit" @click.prevent="onRemove(task)">Удалить
           </button>
         </p>
       </form>
     </li>
   </ul>
-  <p v-else class="list-task list-task--center">Текущих задач нет</p>
+  <p v-else class="list-task list-task--center">Список задач пуст</p>
 </template>
 
 <style scoped lang="scss">
@@ -58,6 +64,8 @@
 
     &--center {
       padding-bottom: 70px;
+
+      color: var(--gray-color);
       text-align: center;
     }
   }
@@ -91,8 +99,8 @@
   .list-task__desc {
     position: relative;
 
-    display: inline-block;
     flex-grow: 1;
+    display: inline-block;
     padding: 0 30px 0 60px;
 
     cursor: pointer;
@@ -138,9 +146,10 @@
     color: var(--blue-color);
 
     opacity: 0;
-    pointer-events: none;
 
     transition: $transition;
+
+    pointer-events: none;
   }
 
   .list-task__checkbox:checked ~ .list-task__icon {
